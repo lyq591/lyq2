@@ -1,0 +1,188 @@
+{
+  "dataset": "FJSP-F",
+  "description": "含工装约束的柔性作业车间调度基准数据集",
+  "source": "https://zenodo.org/records/11526695",
+  "num_instances": 20,
+  "instances": [
+    {
+      "instance": "FJSP-F1",
+      "num_jobs": 3,
+      "num_machines": 2,
+      "num_fixtures": 2,
+      "ops_per_job": 3,
+      "total_pt": 73,
+      "lb_makespan": 38
+    },
+    {
+      "instance": "FJSP-F2",
+      "num_jobs": 3,
+      "num_machines": 2,
+      "num_fixtures": 2,
+      "ops_per_job": 5,
+      "total_pt": 154,
+      "lb_makespan": 48
+    },
+    {
+      "instance": "FJSP-F3",
+      "num_jobs": 4,
+      "num_machines": 3,
+      "num_fixtures": 3,
+      "ops_per_job": 3,
+      "total_pt": 95,
+      "lb_makespan": 44
+    },
+    {
+      "instance": "FJSP-F4",
+      "num_jobs": 4,
+      "num_machines": 3,
+      "num_fixtures": 3,
+      "ops_per_job": 5,
+      "total_pt": 237,
+      "lb_makespan": 75
+    },
+    {
+      "instance": "FJSP-F5",
+      "num_jobs": 5,
+      "num_machines": 4,
+      "num_fixtures": 4,
+      "ops_per_job": 3,
+      "total_pt": 120,
+      "lb_makespan": 44
+    },
+    {
+      "instance": "FJSP-F6",
+      "num_jobs": 5,
+      "num_machines": 4,
+      "num_fixtures": 4,
+      "ops_per_job": 5,
+      "total_pt": 409,
+      "lb_makespan": 70
+    },
+    {
+      "instance": "FJSP-F7",
+      "num_jobs": 6,
+      "num_machines": 5,
+      "num_fixtures": 4,
+      "ops_per_job": 3,
+      "total_pt": 129,
+      "lb_makespan": 39
+    },
+    {
+      "instance": "FJSP-F8",
+      "num_jobs": 6,
+      "num_machines": 5,
+      "num_fixtures": 5,
+      "ops_per_job": 5,
+      "total_pt": 375,
+      "lb_makespan": 74
+    },
+    {
+      "instance": "FJSP-F9",
+      "num_jobs": 8,
+      "num_machines": 6,
+      "num_fixtures": 6,
+      "ops_per_job": 3,
+      "total_pt": 368,
+      "lb_makespan": 46
+    },
+    {
+      "instance": "FJSP-F10",
+      "num_jobs": 8,
+      "num_machines": 6,
+      "num_fixtures": 6,
+      "ops_per_job": 5,
+      "total_pt": 577,
+      "lb_makespan": 83
+    },
+    {
+      "instance": "FJSP-F11",
+      "num_jobs": 10,
+      "num_machines": 6,
+      "num_fixtures": 6,
+      "ops_per_job": 5,
+      "total_pt": 577,
+      "lb_makespan": 136
+    },
+    {
+      "instance": "FJSP-F12",
+      "num_jobs": 10,
+      "num_machines": 6,
+      "num_fixtures": 7,
+      "ops_per_job": 6,
+      "total_pt": 799,
+      "lb_makespan": 252
+    },
+    {
+      "instance": "FJSP-F13",
+      "num_jobs": 12,
+      "num_machines": 7,
+      "num_fixtures": 8,
+      "ops_per_job": 5,
+      "total_pt": 954,
+      "lb_makespan": 122
+    },
+    {
+      "instance": "FJSP-F14",
+      "num_jobs": 12,
+      "num_machines": 7,
+      "num_fixtures": 8,
+      "ops_per_job": 6,
+      "total_pt": 1122,
+      "lb_makespan": 211
+    },
+    {
+      "instance": "FJSP-F15",
+      "num_jobs": 15,
+      "num_machines": 8,
+      "num_fixtures": 10,
+      "ops_per_job": 5,
+      "total_pt": 1133,
+      "lb_makespan": 137
+    },
+    {
+      "instance": "FJSP-F16",
+      "num_jobs": 15,
+      "num_machines": 8,
+      "num_fixtures": 10,
+      "ops_per_job": 6,
+      "total_pt": 1295,
+      "lb_makespan": 244
+    },
+    {
+      "instance": "FJSP-F17",
+      "num_jobs": 18,
+      "num_machines": 9,
+      "num_fixtures": 11,
+      "ops_per_job": 5,
+      "total_pt": 1249,
+      "lb_makespan": 124
+    },
+    {
+      "instance": "FJSP-F18",
+      "num_jobs": 18,
+      "num_machines": 9,
+      "num_fixtures": 11,
+      "ops_per_job": 6,
+      "total_pt": 1842,
+      "lb_makespan": 227
+    },
+    {
+      "instance": "FJSP-F19",
+      "num_jobs": 20,
+      "num_machines": 10,
+      "num_fixtures": 12,
+      "ops_per_job": 5,
+      "total_pt": 1916,
+      "lb_makespan": 136
+    },
+    {
+      "instance": "FJSP-F20",
+      "num_jobs": 20,
+      "num_machines": 10,
+      "num_fixtures": 12,
+      "ops_per_job": 6,
+      "total_pt": 2349,
+      "lb_makespan": 261
+    }
+  ]
+}
