@@ -81,9 +81,13 @@ lyq2/
 │   ├── start_backend.bat           # 启动后端服务
 │   ├── start_frontend.bat          # 启动前端服务
 │   └── run_tests.bat               # 运行自动化测试
-└── prompt/                         # AI工具提示词追溯
-    ├── README.md
-    └── phase2_data_preparation.json
+├── docs/                           # 项目文档
+│   ├── 需求规格说明书.md            # 需求规格说明书
+│   └── 系统设计报告.md              # 系统设计报告
+├── prompt/                         # AI工具提示词追溯
+│   ├── README.md
+│   ├── phase2_data_preparation.json
+│   └── phase3_integration_and_reporting.json
 ```
 
 ---
@@ -251,8 +255,13 @@ python tests\run_tests.py
 | 第一阶段 | 选题说明、方案设计 | ✅ 已完成 |
 | 第二阶段 | 数据准备（数据来源、预处理、提示词追溯） | ✅ 已完成 |
 | 第三阶段 | 详细开发（后端、前端、数据库、算法、测试） | ✅ 已完成 |
-| 第四阶段 | 集成调试、设计报告撰写 | 🔄 待开始 |
+| 第四阶段 | 集成调试、需求规格说明书、设计报告 | ✅ 已完成 |
 | 第五阶段 | 演示视频、答辩PPT、答辩 | 🔄 待开始 |
+
+### 项目文档
+
+- [需求规格说明书](docs/需求规格说明书.md) — 功能需求、非功能需求、接口需求、数据需求、验收标准
+- [系统设计报告](docs/系统设计报告.md) — 架构设计、数据库设计、API设计、遗传算法设计、前端设计、测试设计
 
 ---
 

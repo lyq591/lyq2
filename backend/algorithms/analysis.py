@@ -167,15 +167,16 @@ class DataAnalyzer:
         for iid in instance_ids:
             stats = self.get_instance_stats(iid)
             if stats:
+                inst = self.instances.get(iid, {})
                 comparison.append({
                     "instance_id": iid,
                     "num_jobs": stats["scale"]["num_jobs"],
                     "num_machines": stats["scale"]["num_machines"],
                     "num_fixtures": stats["scale"]["num_fixtures"],
-                    "total_ops": stats["total_operations"],
-                    "avg_pt": stats["processing_time_stats"]["mean"],
-                    "max_pt": stats["processing_time_stats"]["max"],
-                    "total_pt": stats.get("metadata", {}).get("total_processing_time", 0),
+                    "total_operations": stats["total_operations"],
+                    "avg_processing_time": stats["processing_time_stats"]["mean"],
+                    "max_processing_time": stats["processing_time_stats"]["max"],
+                    "total_processing_time": inst.get("metadata", {}).get("total_processing_time", 0),
                 })
         return comparison
 
@@ -206,9 +207,18 @@ class DataAnalyzer:
             "total_machine_slots": total_machines,
             "total_operations": total_ops,
             "scale_range": {
-                "jobs": f"{min(s['scale']['num_jobs'] for s in all_stats)} - {max(s['scale']['num_jobs'] for s in all_stats)}",
-                "machines": f"{min(s['scale']['num_machines'] for s in all_stats)} - {max(s['scale']['num_machines'] for s in all_stats)}",
-                "fixtures": f"{min(s['scale']['num_fixtures'] for s in all_stats)} - {max(s['scale']['num_fixtures'] for s in all_stats)}",
+                "num_jobs": {
+                    "min": min(s["scale"]["num_jobs"] for s in all_stats),
+                    "max": max(s["scale"]["num_jobs"] for s in all_stats),
+                },
+                "num_machines": {
+                    "min": min(s["scale"]["num_machines"] for s in all_stats),
+                    "max": max(s["scale"]["num_machines"] for s in all_stats),
+                },
+                "num_fixtures": {
+                    "min": min(s["scale"]["num_fixtures"] for s in all_stats),
+                    "max": max(s["scale"]["num_fixtures"] for s in all_stats),
+                },
             },
             "avg_total_processing_time": round(sum(all_pts) / len(all_pts), 2) if all_pts else 0,
             "max_total_processing_time": max(all_pts) if all_pts else 0,
