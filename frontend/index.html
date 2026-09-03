@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FJSP智能调度辅助Agent系统</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部导航 -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">⚙️ FJSP调度系统</div>
+                <span class="subtitle">基于DeepSeek Harness的柔性作业车间智能调度辅助Agent</span>
+            </div>
+            <div class="header-right">
+                <span class="status-dot" :class="{active: apiConnected}"></span>
+                <span class="status-text">{{ apiConnected ? 'API已连接' : 'API未连接' }}</span>
+            </div>
+        </header>
+
+        <!-- 侧边导航 -->
+        <nav class="sidebar">
+            <div class="nav-item" :class="{active: currentPage==='dashboard'}" @click="currentPage='dashboard'">
+                <span class="nav-icon">📊</span> 系统概览
+            </div>
+            <div class="nav-item" :class="{active: currentPage==='dataset'}" @click="currentPage='dataset'; loadInstances()">
+                <span class="nav-icon">📁</span> 数据集管理
+            </div>
+            <div class="nav-item" :class="{active: currentPage==='schedule'}" @click="currentPage='schedule'; loadInstances()">
+                <span class="nav-icon">🎯</span> 智能调度
+            </div>
+            <div class="nav-item" :class="{active: currentPage==='analysis'}" @click="currentPage='analysis'; loadInstances()">
+                <span class="nav-icon">📈</span> 数据分析
+            </div>
+            <div class="nav-item" :class="{active: currentPage==='digitaltwin'}" @click="currentPage='digitaltwin'">
+                <span class="nav-icon">🏭</span> 数字孪生
+            </div>
+            <div class="nav-item" :class="{active: currentPage==='history'}" @click="currentPage='history'; loadHistory()">
+                <span class="nav-icon">📋</span> 调度历史
+            </div>
+        </nav>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+
+            <!-- ========== 系统概览 ========== -->
+            <div v-if="currentPage==='dashboard'" class="page">
+                <h2 class="page-title">系统概览</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-value">{{ datasetOverview.num_instances || 0 }}</div>
+                        <div class="stat-label">数据实例数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-value">{{ dbStats.total_results || 0 }}</div>
+                        <div class="stat-label">已完成调度</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-value">{{ dbStats.avg_makespan || 0 }}</div>
+                        <div class="stat-label">平均Makespan</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🤖</div>
+                        <div class="stat-value">4</div>
+                        <div class="stat-label">技术方向覆盖</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>系统架构</h3>
+                    <div class="arch-diagram">
+                        <div class="arch-layer">
+                            <div class="arch-title">前端层 (Vue3 + ECharts)</div>
+                            <div class="arch-items">
+                                <span class="arch-item">仪表盘</span>
+                                <span class="arch-item">甘特图</span>
+                                <span class="arch-item">数据分析</span>
+                                <span class="arch-item">数字孪生</span>
+                            </div>
+                        </div>
+                        <div class="arch-arrow">↓ RESTful API ↓</div>
+                        <div class="arch-layer">
+                            <div class="arch-title">后端层 (FastAPI)</div>
+                            <div class="arch-items">
+                                <span class="arch-item">调度服务</span>
+                                <span class="arch-item">数据服务</span>
+                                <span class="arch-item">分析服务</span>
+                                <span class="arch-item">任务管理</span>
+                            </div>
+                        </div>
+                        <div class="arch-arrow">↓ 算法模块 ↓</div>
+                        <div class="arch-layer">
+                            <div class="arch-title">算法层 (纯Python)</div>
+                            <div class="arch-items">
+                                <span class="arch-item">遗传算法</span>
+                                <span class="arch-item">瓶颈识别</span>
+                                <span class="arch-item">决策解释</span>
+                                <span class="arch-item">特征提取</span>
+                            </div>
+                        </div>
+                        <div class="arch-arrow">↓ 数据层 ↓</div>
+                        <div class="arch-layer">
+                            <div class="arch-title">数据层 (SQLite + JSON)</div>
+                            <div class="arch-items">
+                                <span class="arch-item">FJSP-F数据集</span>
+                                <span class="arch-item">调度结果</span>
+                                <span class="arch-item">任务记录</span>
+                                <span class="arch-item">系统日志</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>技术方向覆盖</h3>
+                    <div class="tech-grid">
+                        <div class="tech-card">
+                            <div class="tech-name">工艺规划与车间调度</div>
+                            <div class="tech-desc">遗传算法求解FJSP调度问题，POX交叉、锦标赛选择</div>
+                            <div class="tech-status done">✓ 已实现</div>
+                        </div>
+                        <div class="tech-card">
+                            <div class="tech-name">工业大数据采集与分析</div>
+                            <div class="tech-desc">数据集统计分析、瓶颈识别、特征提取、负载均衡分析</div>
+                            <div class="tech-status done">✓ 已实现</div>
+                        </div>
+                        <div class="tech-card">
+                            <div class="tech-name">数字孪生与系统仿真</div>
+                            <div class="tech-desc">调度过程可视化、车间状态映射、甘特图实时展示</div>
+                            <div class="tech-status done">✓ 已实现</div>
+                        </div>
+                        <div class="tech-card">
+                            <div class="tech-name">智能制造系统集成</div>
+                            <div class="tech-desc">RESTful API、SQLite数据库、调度决策自然语言解释</div>
+                            <div class="tech-status done">✓ 已实现</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== 数据集管理 ========== -->
+            <div v-if="currentPage==='dataset'" class="page">
+                <h2 class="page-title">数据集管理</h2>
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>FJSP-F 基准数据集</h3>
+                        <button class="btn btn-primary" @click="loadInstances()">刷新列表</button>
+                    </div>
+                    <table class="data-table" v-if="instances.length > 0">
+                        <thead>
+                            <tr>
+                                <th>实例ID</th>
+                                <th>作业数</th>
+                                <th>机器数</th>
+                                <th>工装数</th>
+                                <th>工序/作业</th>
+                                <th>总加工时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="inst in instances" :key="inst.instance_id">
+                                <td class="font-mono">{{ inst.instance_id }}</td>
+                                <td>{{ inst.num_jobs }}</td>
+                                <td>{{ inst.num_machines }}</td>
+                                <td>{{ inst.num_fixtures }}</td>
+                                <td>{{ inst.operations_per_job }}</td>
+                                <td>{{ inst.total_processing_time }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info" @click="viewInstance(inst.instance_id)">详情</button>
+                                    <button class="btn btn-sm btn-primary" @click="goSchedule(inst.instance_id)">调度</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div v-else class="empty-state">加载中...</div>
+                </div>
+
+                <!-- 实例详情弹窗 -->
+                <div v-if="showInstanceDetail" class="modal-overlay" @click.self="showInstanceDetail=false">
+                    <div class="modal modal-lg">
+                        <div class="modal-header">
+                            <h3>{{ selectedInstance.instance_id }} 详情</h3>
+                            <button class="btn-close" @click="showInstanceDetail=false">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="detail-grid">
+                                <div class="detail-item"><span class="detail-label">作业数:</span> {{ selectedInstance.scale?.num_jobs }}</div>
+                                <div class="detail-item"><span class="detail-label">机器数:</span> {{ selectedInstance.scale?.num_machines }}</div>
+                                <div class="detail-item"><span class="detail-label">工装数:</span> {{ selectedInstance.scale?.num_fixtures }}</div>
+                                <div class="detail-item"><span class="detail-label">总加工时间:</span> {{ selectedInstance.metadata?.total_processing_time }}</div>
+                                <div class="detail-item"><span class="detail-label">下界:</span> {{ selectedInstance.metadata?.lower_bound_makespan }}</div>
+                                <div class="detail-item"><span class="detail-label">最大交货期:</span> {{ selectedInstance.metadata?.max_delivery_time }}</div>
+                            </div>
+                            <h4>作业列表</h4>
+                            <div class="job-list">
+                                <div v-for="job in selectedInstance.jobs" :key="job.job_id" class="job-item">
+                                    <div class="job-header">
+                                        <strong>作业 {{ job.job_id }}</strong>
+                                        <span>释放: {{ job.release_time }} | 交货: {{ job.delivery_time }} | 优先级: {{ job.priority }}</span>
+                                    </div>
+                                    <div class="op-list">
+                                        <span v-for="op in job.operations" :key="op.operation_id" class="op-tag">
+                                            工序{{ op.operation_id }}: 机器{{ op.eligible_machines.join('/') }} ({{ op.processing_times.join('/') }})
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== 智能调度 ========== -->
+            <div v-if="currentPage==='schedule'" class="page">
+                <h2 class="page-title">智能调度</h2>
+
+                <div class="panel">
+                    <h3>调度参数配置</h3>
+                    <div class="form-grid">
+                        <div class="form-item">
+                            <label>选择实例</label>
+                            <select v-model="scheduleConfig.instance_id" class="form-control">
+                                <option v-for="inst in instances" :key="inst.instance_id" :value="inst.instance_id">
+                                    {{ inst.instance_id }} ({{ inst.num_jobs }}作业×{{ inst.num_machines }}机器)
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label>种群大小</label>
+                            <input type="number" v-model.number="scheduleConfig.pop_size" class="form-control" min="10" max="500">
+                        </div>
+                        <div class="form-item">
+                            <label>迭代代数</label>
+                            <input type="number" v-model.number="scheduleConfig.max_gen" class="form-control" min="10" max="1000">
+                        </div>
+                        <div class="form-item">
+                            <label>随机种子</label>
+                            <input type="number" v-model.number="scheduleConfig.seed" class="form-control">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-lg" :disabled="scheduling" @click="runSchedule()">
+                        {{ scheduling ? '调度计算中...' : '🚀 开始调度' }}
+                    </button>
+                </div>
+
+                <!-- 调度结果 -->
+                <div v-if="scheduleResult" class="panel">
+                    <div class="result-header">
+                        <h3>调度结果</h3>
+                        <div class="result-stats">
+                            <span class="result-badge">Makespan: <strong>{{ scheduleResult.makespan }}</strong></span>
+                            <span class="result-badge">耗时: <strong>{{ scheduleResult.elapsed_time }}s</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- 甘特图 -->
+                    <div ref="ganttChart" class="chart-container" style="height:400px;"></div>
+
+                    <!-- 收敛曲线 -->
+                    <h4>算法收敛曲线</h4>
+                    <div ref="convergenceChart" class="chart-container" style="height:300px;"></div>
+
+                    <!-- 机器利用率 -->
+                    <h4>机器利用率</h4>
+                    <div class="util-grid">
+                        <div v-for="mu in scheduleResult.machine_utilization" :key="mu.machine_id" class="util-card">
+                            <div class="util-title">机器 {{ mu.machine_id }}</div>
+                            <div class="util-bar">
+                                <div class="util-fill" :style="{width: mu.utilization_rate + '%'}"></div>
+                            </div>
+                            <div class="util-value">{{ mu.utilization_rate }}% ({{ mu.num_tasks }}个任务)</div>
+                        </div>
+                    </div>
+
+                    <!-- 决策解释 -->
+                    <div v-if="scheduleResult.analysis" class="analysis-box">
+                        <h4>🤖 调度决策解释</h4>
+                        <p>{{ scheduleResult.analysis.explanation }}</p>
+                        <div class="analysis-details">
+                            <div><strong>关键路径作业:</strong> <span v-for="cj in scheduleResult.analysis.critical_path_jobs" :key="cj.job_id" class="tag">作业{{ cj.job_id }}({{ cj.finish_time }})</span></div>
+                            <div><strong>负载均衡:</strong> 平均利用率 {{ scheduleResult.analysis.machine_load_balance.avg_utilization }}%，{{ scheduleResult.analysis.machine_load_balance.is_balanced ? '负载均衡' : '存在不均衡' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== 数据分析 ========== -->
+            <div v-if="currentPage==='analysis'" class="page">
+                <h2 class="page-title">数据分析</h2>
+
+                <div class="panel">
+                    <h3>数据集规模分布</h3>
+                    <div ref="scaleChart" class="chart-container" style="height:350px;"></div>
+                </div>
+
+                <div class="panel">
+                    <h3>实例统计对比</h3>
+                    <div class="form-item" style="margin-bottom:15px;">
+                        <label>选择实例查看统计</label>
+                        <select v-model="analysisInstance" class="form-control" @change="loadInstanceStats">
+                            <option v-for="inst in instances" :key="inst.instance_id" :value="inst.instance_id">{{ inst.instance_id }}</option>
+                        </select>
+                    </div>
+                    <div v-if="instanceStats" class="stats-detail">
+                        <div class="stats-row">
+                            <div class="stat-mini"><span>总工序数</span><strong>{{ instanceStats.total_operations }}</strong></div>
+                            <div class="stat-mini"><span>平均工序/作业</span><strong>{{ instanceStats.avg_operations_per_job }}</strong></div>
+                            <div class="stat-mini"><span>平均加工时间</span><strong>{{ instanceStats.processing_time_stats.mean }}</strong></div>
+                            <div class="stat-mini"><span>加工时间范围</span><strong>{{ instanceStats.processing_time_stats.min }} - {{ instanceStats.processing_time_stats.max }}</strong></div>
+                        </div>
+                        <h4>机器负荷分布</h4>
+                        <div ref="workloadChart" class="chart-container" style="height:300px;"></div>
+                        <h4>瓶颈识别</h4>
+                        <div v-if="bottleneckAnalysis" class="bottleneck-box">
+                            <p><strong>高负荷机器:</strong> <span v-for="m in bottleneckAnalysis.machine_bottlenecks" :key="m.machine_id" class="tag" :class="{warn: m.is_bottleneck}">机器{{ m.machine_id }}({{ m.eligible_op_count }}个可选工序){{ m.is_bottleneck ? ' ⚠️瓶颈' : '' }}</span></p>
+                            <p><strong>建议:</strong> {{ bottleneckAnalysis.recommendation }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== 数字孪生 ========== -->
+            <div v-if="currentPage==='digitaltwin'" class="page">
+                <h2 class="page-title">数字孪生车间</h2>
+                <div class="panel">
+                    <div class="twin-controls">
+                        <label>选择实例:</label>
+                        <select v-model="twinInstance" class="form-control" style="width:200px;">
+                            <option v-for="inst in instances" :key="inst.instance_id" :value="inst.instance_id">{{ inst.instance_id }}</option>
+                        </select>
+                        <button class="btn btn-primary" @click="loadTwinData()">加载车间</button>
+                        <button class="btn" @click="toggleTwinAnimation">{{ twinRunning ? '⏸ 暂停' : '▶ 播放' }}</button>
+                        <span>时间: {{ twinTime }} / {{ twinMaxTime }}</span>
+                    </div>
+
+                    <div class="twin-workshop" ref="twinCanvas">
+                        <!-- 机器 -->
+                        <div class="twin-machines">
+                            <div v-for="m in twinMachines" :key="m.id" class="twin-machine" :class="{running: m.status==='running', idle: m.status==='idle'}">
+                                <div class="twin-machine-icon">🖥️</div>
+                                <div class="twin-machine-name">机器{{ m.id }}</div>
+                                <div class="twin-machine-status">{{ m.status==='running' ? '加工中: 作业'+m.current_job : '空闲' }}</div>
+                                <div class="twin-machine-progress" v-if="m.status==='running'">
+                                    <div class="twin-progress-fill" :style="{width: m.progress + '%'}"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 作业队列 -->
+                        <div class="twin-jobs">
+                            <h4>作业状态</h4>
+                            <div class="twin-job-list">
+                                <div v-for="j in twinJobs" :key="j.id" class="twin-job" :class="j.status">
+                                    <span class="twin-job-id">作业{{ j.id }}</span>
+                                    <span class="twin-job-status">{{ j.status==='done' ? '✅完成' : j.status==='running' ? '🔄加工中' : '⏳等待' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="twin-note">数字孪生可视化：实时映射车间设备运行状态，展示调度方案的执行过程。技术方向：数字孪生与系统仿真。</p>
+                </div>
+            </div>
+
+            <!-- ========== 调度历史 ========== -->
+            <div v-if="currentPage==='history'" class="page">
+                <h2 class="page-title">调度历史</h2>
+                <div class="panel">
+                    <table class="data-table" v-if="history.length > 0">
+                        <thead>
+                            <tr>
+                                <th>任务ID</th>
+                                <th>实例</th>
+                                <th>状态</th>
+                                <th>Makespan</th>
+                                <th>耗时(s)</th>
+                                <th>创建时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="task in history" :key="task.id">
+                                <td>{{ task.id }}</td>
+                                <td class="font-mono">{{ task.instance_id }}</td>
+                                <td><span class="status-tag" :class="task.status">{{ task.status }}</span></td>
+                                <td>{{ task.makespan || '-' }}</td>
+                                <td>{{ task.elapsed_time || '-' }}</td>
+                                <td>{{ formatTime(task.created_at) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div v-else class="empty-state">暂无调度历史记录</div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- 加载遮罩 -->
+        <div v-if="scheduling" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">遗传算法调度计算中...</div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
