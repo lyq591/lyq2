@@ -26,6 +26,9 @@ FRONTEND_URL = f"http://{FRONTEND_HOST}:{FRONTEND_PORT}"
 
 IS_WINDOWS = sys.platform == "win32"
 
+# PID文件，用于一键关闭脚本定位进程
+PID_FILE = os.path.join(BASE_DIR, ".running_pids")
+
 # ==================== 工具函数 ====================
 
 def print_banner():
@@ -183,6 +186,15 @@ def main():
         else:
             print("TIMEOUT")
 
+        # 记录PID到文件，供一键关闭脚本使用
+        try:
+            with open(PID_FILE, "w") as f:
+                f.write(f"backend={backend_proc.pid}\n")
+                f.write(f"frontend={frontend_proc.pid}\n")
+            print(f"  PID file written: {PID_FILE}")
+        except Exception as e:
+            print(f"  WARNING: Could not write PID file: {e}")
+
         # 7. 打开浏览器
         print()
         print("[Browser] Opening frontend page...")
@@ -237,6 +249,12 @@ def main():
         print()
         stop_process(backend_proc, "Backend")
         stop_process(frontend_proc, "Frontend")
+        # 删除PID文件
+        try:
+            if os.path.exists(PID_FILE):
+                os.remove(PID_FILE)
+        except Exception:
+            pass
         print()
         print("=" * 60)
         print("  All services stopped.")

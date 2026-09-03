@@ -27,3 +27,4 @@ desktop.ini
 # Temporary
 *.tmp
 *.log
+.running_pids
