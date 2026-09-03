@@ -36,7 +36,7 @@
             <div class="nav-item" :class="{active: currentPage==='analysis'}" @click="currentPage='analysis'; loadInstances()">
                 <span class="nav-icon">📈</span> 数据分析
             </div>
-            <div class="nav-item" :class="{active: currentPage==='digitaltwin'}" @click="currentPage='digitaltwin'">
+            <div class="nav-item" :class="{active: currentPage==='digitaltwin'}" @click="currentPage='digitaltwin'; loadInstances()">
                 <span class="nav-icon">🏭</span> 数字孪生
             </div>
             <div class="nav-item" :class="{active: currentPage==='history'}" @click="currentPage='history'; loadHistory()">
@@ -87,7 +87,7 @@
                         </div>
                         <div class="arch-arrow">↓ RESTful API ↓</div>
                         <div class="arch-layer">
-                            <div class="arch-title">后端层 (FastAPI)</div>
+                            <div class="arch-title">后端层 (Flask)</div>
                             <div class="arch-items">
                                 <span class="arch-item">调度服务</span>
                                 <span class="arch-item">数据服务</span>
@@ -336,7 +336,7 @@
                         <select v-model="twinInstance" class="form-control" style="width:200px;">
                             <option v-for="inst in instances" :key="inst.instance_id" :value="inst.instance_id">{{ inst.instance_id }}</option>
                         </select>
-                        <button class="btn btn-primary" @click="loadTwinData()">加载车间</button>
+                        <button class="btn btn-primary" :disabled="twinLoading" @click="loadTwinData()">{{ twinLoading ? '加载中...' : '加载车间' }}</button>
                         <button class="btn" @click="toggleTwinAnimation">{{ twinRunning ? '⏸ 暂停' : '▶ 播放' }}</button>
                         <span>时间: {{ twinTime }} / {{ twinMaxTime }}</span>
                     </div>
